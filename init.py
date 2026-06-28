@@ -22,7 +22,7 @@ def main():
     # Make a traced Gemini call
     response = client.models.generate_content(
         model="gemini-3-flash-preview",
-        contents="Explain quantum computing in simple terms.",
+        contents="Explain quantum computing in simple terms. do it in 3 lines only",
     )
 
     print(response.text)

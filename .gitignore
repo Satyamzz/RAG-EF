@@ -1,0 +1,62 @@
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment directories
+venv/
+.env/
+.env
+.venv/
+ENV/
+env/
+pyvenv.cfg
+.Python
+
+# Distribution/build files
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+pip-wheel-metadata/
+share/python-wheels/
+
+# Test and coverage outputs
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.log
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# IDE/editor settings
+.vscode/
+*.code-workspace
+.idea/
+
+# Environment and secret files
+.env*
+secrets/
+*.pem
+
+# Data files often generated during development
+*.db
+*.sqlite
+*.sqlite3
+*.csv
+*.tsv
+*.parquet
+*.npz
+*.npy
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+
+# OS files
+.DS_Store
+Thumbs.db
+__MACOSX/
