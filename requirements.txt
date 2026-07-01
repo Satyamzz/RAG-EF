@@ -7,3 +7,5 @@ langchain-community==0.4.2
 langchain-text-splitters==1.1.2
 pinecone==7.3.0
 python-dotenv==1.2.2
+pypdf
+openai

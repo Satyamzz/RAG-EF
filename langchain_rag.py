@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from google import genai
+from openai import OpenAI
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from langchain_core.prompts import PromptTemplate
@@ -8,11 +8,20 @@ from langchain_core.prompts import PromptTemplate
 load_dotenv(dotenv_path=".env")
 
 # --- Config ---
-INDEX_NAME = "paulgrahamessay"
+INDEX_NAME = "blutrain"
 EMBEDDING_MODEL = "models/gemini-embedding-001"
 OUTPUT_DIMENSIONALITY = 1024
-LLM_MODEL = "gemini-2.0-flash"  # change to "gemini-3-flash-preview" if needed
+LLM_MODEL = os.getenv("HF_LLM_MODEL", "meta-llama/Meta-Llama-3-8B-Instruct:together")
 TOP_K = 1
+
+hf_token = os.getenv("HF_TOKEN")
+if not hf_token:
+    raise RuntimeError("HF_TOKEN is not set. Add your Hugging Face token to the .env file.")
+
+client = OpenAI(
+    base_url=os.getenv("HF_BASE_URL", "https://router.huggingface.co/v1"),
+    api_key=hf_token,
+)
 
 # --- Init embeddings + vector store ---
 embeddings = GoogleGenerativeAIEmbeddings(
@@ -26,9 +35,6 @@ vectorstore = PineconeVectorStore(
 )
 
 retriever = vectorstore.as_retriever(search_kwargs={"k": TOP_K})
-
-# --- Init Gemini client (direct SDK) ---
-gemini_client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
 
 # --- Prompt template ---
 PROMPT_TEMPLATE = """You are a helpful assistant. Answer the question using ONLY the context provided.
@@ -61,18 +67,26 @@ def query(question: str, show_chunks: bool = False) -> str:
     context = format_docs(docs)
     prompt = PROMPT_TEMPLATE.format(context=context, question=question)
 
-    # Generate using direct Gemini SDK
-    response = gemini_client.models.generate_content(
+    # Generate using Hugging Face Llama through the OpenAI-compatible API
+    response = client.chat.completions.create(
         model=LLM_MODEL,
-        contents=prompt
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant. Answer the question using ONLY the context provided.",
+            },
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.1,
+        max_tokens=400,
     )
 
-    return response.text
+    return response.choices[0].message.content
 
 # --- CLI ---
 def main():
     print("\n╔══════════════════════════════════════╗")
-    print("║   Paul Graham Essay RAG — CLI Chat   ║")
+    print("║   BlueTrain RAG — CLI Chat   ║")
     print("╚══════════════════════════════════════╝")
     print("Commands:  'chunks' = toggle chunk display | 'exit' = quit\n")
 

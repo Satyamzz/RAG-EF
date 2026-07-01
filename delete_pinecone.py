@@ -7,7 +7,7 @@ load_dotenv(dotenv_path=".env")
 # --- Pinecone setup ---
 pc = Pinecone(api_key=os.environ["PINECONE_API_KEY"])
 
-index_name = "paulgrahamessay"
+index_name = "blutrain"
 
 # Delete the index if it exists
 if index_name in pc.list_indexes().names():
